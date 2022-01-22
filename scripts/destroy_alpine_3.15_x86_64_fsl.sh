@@ -9,12 +9,12 @@ if (( $EUID != 0 )); then
 fi
 
 PROJECT_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
-OS_NAME=alpine
+OS_NAME=alpine_3.15_x86_64
 TARGET_FSL=$PROJECT_DIRECTORY/file_system_layers/$OS_NAME
 
 # Unmounts all filesystem under the specified directory tree.
 cat /proc/mounts | cut -d' ' -f2 | grep "^$TARGET_FSL" | sort -r | while read path; do
-    echo "Unmounting $path" >&2
+    echo "unmounting $path" >&2
     umount -fn "$path" || exit 1
 done
 echo "deleteing file system layer directory: $TARGET_FSL"

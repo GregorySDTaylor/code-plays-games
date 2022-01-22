@@ -9,7 +9,7 @@ if (( $EUID != 0 )); then
 fi
 
 PROJECT_DIRECTORY=`dirname "$0"`/..
-OS_NAME=alpine
+OS_NAME=alpine_3.15_x86_64
 SCRIPT_DIRECTORY=$PROJECT_DIRECTORY/scripts
 TEMP_DIRECTORY=$SCRIPT_DIRECTORY/${OS_NAME}_temp
 TARGET_FSL=$PROJECT_DIRECTORY/file_system_layers/$OS_NAME
