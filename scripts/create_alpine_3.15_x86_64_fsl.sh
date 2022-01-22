@@ -15,7 +15,8 @@ TEMP_DIRECTORY=$SCRIPT_DIRECTORY/${OS_NAME}_temp
 TARGET_FSL=$PROJECT_DIRECTORY/file_system_layers/$OS_NAME
 MIRROR_HOST_PATH=http://dl-cdn.alpinelinux.org/alpine
 ALPINE_VERSION=v3.15
-ALPINE_REPOSITORY=$MIRROR_HOST_PATH/$ALPINE_VERSION/main
+ALPINE_MAIN_REPOSITORY=$MIRROR_HOST_PATH/$ALPINE_VERSION/main
+ALPINE_COMMUNITY_REPOSITORY=$MIRROR_HOST_PATH/$ALPINE_VERSION/community
 APK_TOOLS=apk-tools-static-2.12.7-r3
 APK_TOOLS_URL=$MIRROR_HOST_PATH/$ALPINE_VERSION/main/x86_64/$APK_TOOLS.apk
 APK_TOOLS_ARCHIVE=$TEMP_DIRECTORY/$APK_TOOLS.apk
@@ -31,9 +32,9 @@ echo "creating alpine package management directory: $APK_TOOLS_DIRECTORY"
 mkdir -p $APK_TOOLS_DIRECTORY
 echo "extracting alpine package management tool..."
 tar -xzf $APK_TOOLS_ARCHIVE -C $APK_TOOLS_DIRECTORY
-echo "installing alpine-base from repository: $ALPINE_REPOSITORY"
+echo "installing alpine-base from repository: $ALPINE_MAIN_REPOSITORY"
 $APK_TOOLS_DIRECTORY/sbin/apk.static \
-    --repository $ALPINE_REPOSITORY \
+    --repository $ALPINE_MAIN_REPOSITORY \
     -U --allow-untrusted \
     -p $TARGET_FSL \
     --initdb add alpine-base
@@ -48,8 +49,10 @@ echo "creating the kernel and system information mount..."
 mount -o bind,ro /sys $TARGET_FSL/sys
 echo "configuring OpenDNS name resolution"
 echo -e 'nameserver 8.8.8.8\nnameserver 2620:0:ccc::2' > $TARGET_FSL/etc/resolv.conf
-echo "configuring alpine repository: $ALPINE_REPOSITORY"
+echo "configuring alpine repository: $ALPINE_MAIN_REPOSITORY"
 mkdir -p ${chroot_dir}/etc/apk
-echo "$ALPINE_REPOSITORY" > ${chroot_dir}/etc/apk/repositories
+echo $ALPINE_MAIN_REPOSITORY > $TARGET_FSL/etc/apk/repositories
+echo $ALPINE_COMMUNITY_REPOSITORY >> $TARGET_FSL/etc/apk/repositories
+cat $TARGET_FSL/etc/apk/repositories
 echo "cleaning up temporary files directory: $TEMP_DIRECTORY"
 rm -rf $TEMP_DIRECTORY
