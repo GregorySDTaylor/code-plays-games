@@ -8,10 +8,10 @@ if (( $EUID != 0 )); then
     exit
 fi
 
-PROJECT_DIRECTORY=`dirname "$0"`/..
+PROJECT_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
 OS_NAME=alpine_3.15_x86_64
 SCRIPT_DIRECTORY=$PROJECT_DIRECTORY/scripts
-TEMP_DIRECTORY=$SCRIPT_DIRECTORY/${OS_NAME}_temp
+TEMP_DIRECTORY=$PROJECT_DIRECTORY/temp/$OS_NAME
 TARGET_FSL=$PROJECT_DIRECTORY/file_system_layers/$OS_NAME
 MIRROR_HOST_PATH=http://dl-cdn.alpinelinux.org/alpine
 ALPINE_VERSION=v3.15
@@ -38,21 +38,11 @@ $APK_TOOLS_DIRECTORY/sbin/apk.static \
     -U --allow-untrusted \
     -p $TARGET_FSL \
     --initdb add alpine-base
-# https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch06.html#devDevicesAndSpecialFiles
-echo "creating the devices and special files mount..."
-mount -o bind,ro /dev $TARGET_FSL/dev
-# https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch06.html#procKernelAndProcessInformationVir
-echo "creating the kernel and process information mount..."
-mount -t proc,ro none $TARGET_FSL/proc
-# https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch06.html#sysKernelAndSystemInformation
-echo "creating the kernel and system information mount..."
-mount -o bind,ro /sys $TARGET_FSL/sys
 echo "configuring OpenDNS name resolution"
 echo -e 'nameserver 8.8.8.8\nnameserver 2620:0:ccc::2' > $TARGET_FSL/etc/resolv.conf
-echo "configuring alpine repository: $ALPINE_MAIN_REPOSITORY"
-mkdir -p ${chroot_dir}/etc/apk
+echo "configuring alpine repositories: $ALPINE_MAIN_REPOSITORY"
+mkdir -p $TARGET_FSL/etc/apk
 echo $ALPINE_MAIN_REPOSITORY > $TARGET_FSL/etc/apk/repositories
 echo $ALPINE_COMMUNITY_REPOSITORY >> $TARGET_FSL/etc/apk/repositories
-cat $TARGET_FSL/etc/apk/repositories
 echo "cleaning up temporary files directory: $TEMP_DIRECTORY"
 rm -rf $TEMP_DIRECTORY

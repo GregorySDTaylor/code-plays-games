@@ -8,14 +8,17 @@ if (( $EUID != 0 )); then
     exit
 fi
 
+if [ "$1" = "" ]
+then
+    echo "failed: this script requires a container name argument"
+    exit
+fi
+
 PROJECT_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
-OS_NAME=alpine_3.15_x86_64
-TARGET_FSL=$PROJECT_DIRECTORY/file_system_layers/$OS_NAME
+CONTAINER_DIRECTORY=$PROJECT_DIRECTORY/containers/$1
 
 # Unmounts all filesystem under the specified directory tree.
-cat /proc/mounts | cut -d' ' -f2 | grep "^$TARGET_FSL" | sort -r | while read path; do
+cat /proc/mounts | cut -d' ' -f2 | grep "^$CONTAINER_DIRECTORY/" | sort -r | while read path; do
     echo "unmounting $path" >&2
     umount -fn "$path" || exit 1
 done
-echo "deleteing file system layer directory: $TARGET_FSL"
-rm -rf $TARGET_FSL
