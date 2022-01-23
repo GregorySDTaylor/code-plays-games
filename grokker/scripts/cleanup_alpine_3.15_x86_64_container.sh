@@ -15,10 +15,10 @@ then
 fi
 
 GROKKER_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
-CONTAINER_DIRECTORY=$GROKKER_DIRECTORY/containers/$1
+OVERLAY_DIRECTORY=$GROKKER_DIRECTORY/overlay_mounts/$1
 
 # Unmounts all filesystem under the specified directory tree.
-cat /proc/mounts | cut -d' ' -f2 | grep "^$CONTAINER_DIRECTORY/" | sort -r | while read path; do
+cat /proc/mounts | cut -d' ' -f2 | grep "^$OVERLAY_DIRECTORY/" | sort -r | while read path; do
     echo "unmounting $path" >&2
     umount -fn "$path" || exit 1
 done

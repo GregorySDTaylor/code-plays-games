@@ -168,5 +168,6 @@ cython_debug/
 #.idea/
 
 # Specific to code_plays_games
-file_system_layers/
-containers/
+grokker/file_system_layers/
+grokker/containers/
+grokker/temp/

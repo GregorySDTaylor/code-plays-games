@@ -15,14 +15,14 @@ then
 fi
 
 GROKKER_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
-CONTAINER_DIRECTORY=$GROKKER_DIRECTORY/containers/$1
+OVERLAY_DIRECTORY=$GROKKER_DIRECTORY/overlay_mounts/$1
 
 # https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch06.html#devDevicesAndSpecialFiles
 echo "creating the devices and special files mount..."
-mount -o bind,ro /dev $CONTAINER_DIRECTORY/dev
+mount -o bind,ro /dev $OVERLAY_DIRECTORY/dev
 # https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch06.html#procKernelAndProcessInformationVir
 echo "creating the kernel and process information mount..."
-mount -t proc,ro none $CONTAINER_DIRECTORY/proc
+mount -t proc,ro none $OVERLAY_DIRECTORY/proc
 # https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch06.html#sysKernelAndSystemInformation
 echo "creating the kernel and system information mount..."
-mount -o bind,ro /sys $CONTAINER_DIRECTORY/sys
+mount -o bind,ro /sys $OVERLAY_DIRECTORY/sys
