@@ -14,8 +14,8 @@ then
     exit
 fi
 
-PROJECT_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
-CONTAINER_DIRECTORY=$PROJECT_DIRECTORY/containers/$1
+GROKKER_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
+CONTAINER_DIRECTORY=$GROKKER_DIRECTORY/containers/$1
 
 # Unmounts all filesystem under the specified directory tree.
 cat /proc/mounts | cut -d' ' -f2 | grep "^$CONTAINER_DIRECTORY/" | sort -r | while read path; do

@@ -14,8 +14,8 @@ then
     exit
 fi
 
-PROJECT_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
-CONTAINER_DIRECTORY=$PROJECT_DIRECTORY/containers/$1
+GROKKER_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
+CONTAINER_DIRECTORY=$GROKKER_DIRECTORY/containers/$1
 
 # https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch06.html#devDevicesAndSpecialFiles
 echo "creating the devices and special files mount..."

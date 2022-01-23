@@ -8,11 +8,11 @@ if (( $EUID != 0 )); then
     exit
 fi
 
-PROJECT_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
+GROKKER_DIRECTORY=$(cd "$(dirname "$0")"/.. && pwd)
 OS_NAME=alpine_3.15_x86_64
-SCRIPT_DIRECTORY=$PROJECT_DIRECTORY/scripts
-TEMP_DIRECTORY=$PROJECT_DIRECTORY/temp/$OS_NAME
-TARGET_FSL=$PROJECT_DIRECTORY/file_system_layers/$OS_NAME
+SCRIPT_DIRECTORY=$GROKKER_DIRECTORY/scripts
+TEMP_DIRECTORY=$GROKKER_DIRECTORY/temp/$OS_NAME
+TARGET_FSL=$GROKKER_DIRECTORY/file_system_layers/$OS_NAME
 MIRROR_HOST_PATH=http://dl-cdn.alpinelinux.org/alpine
 ALPINE_VERSION=v3.15
 ALPINE_MAIN_REPOSITORY=$MIRROR_HOST_PATH/$ALPINE_VERSION/main
@@ -40,7 +40,7 @@ $APK_TOOLS_DIRECTORY/sbin/apk.static \
     --initdb add alpine-base
 echo "configuring OpenDNS name resolution"
 echo -e 'nameserver 8.8.8.8\nnameserver 2620:0:ccc::2' > $TARGET_FSL/etc/resolv.conf
-echo "configuring alpine repositories: $ALPINE_MAIN_REPOSITORY"
+echo "configuring alpine repositories: $ALPINE_MAIN_REPOSITORY,  $ALPINE_COMMUNITY_REPOSITORY"
 mkdir -p $TARGET_FSL/etc/apk
 echo $ALPINE_MAIN_REPOSITORY > $TARGET_FSL/etc/apk/repositories
 echo $ALPINE_COMMUNITY_REPOSITORY >> $TARGET_FSL/etc/apk/repositories
