@@ -171,4 +171,5 @@ cython_debug/
 grokker/file_system_layers/**
 grokker/containers/**
 grokker/temp/**
+grokker/overlay_mounts/**
 !grokker/file_system_layers/base/**
