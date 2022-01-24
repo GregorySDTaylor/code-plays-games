@@ -18,13 +18,13 @@ while getopts "n:l:" option; do
             CONTAINER_NAME=$OPTARG
          fi;;
       l) # Check if layer is missing
-         LOWER_DIRECTORY="$GROKKER_DIRECTORY/file_system_layers/${OPTARG}:"
+         LOWER_DIRECTORY="$GROKKER_DIRECTORY/file_system_layers/${OPTARG}"
          if [ ! -d $LOWER_DIRECTORY ] 
          then
             echo "failed: lower file system layer missing: $LOWER_DIRECTORY"
             exit 1
          fi
-         LOWER_DIRECTORIES+=$LOWER_DIRECTORY;;
+         LOWER_DIRECTORIES+="${LOWER_DIRECTORY}:";;
    esac
 done
 
@@ -66,7 +66,8 @@ mkdir -p $TEMP_DIRECTORY
 echo "creating overlay directory: $OVERLAY_DIRECTORY"
 mkdir -p $OVERLAY_DIRECTORY
 
-echo "creating overlay mount: $OVERLAY_DIRECTORY"
+echo "creating overlay mount: $OVERLAY_DIRECTORY
+with lower layers: $LOWER_DIRECTORIES"
 mount -t overlay overlay \
    -o lowerdir=$LOWER_DIRECTORIES,upperdir=$FSL_DIRECTORY,workdir=$TEMP_DIRECTORY \
    $OVERLAY_DIRECTORY
@@ -87,3 +88,5 @@ mkdir -p $OVERLAY_DIRECTORY/sys
 mount -o bind,ro /sys $OVERLAY_DIRECTORY/sys
 
 echo "container mounted successfully: $CONTAINER_NAME"
+
+exit 0

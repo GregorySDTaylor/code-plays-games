@@ -30,3 +30,5 @@ echo "deleting file system layer directory: $FSL_DIRECTORY"
 rm -rf $FSL_DIRECTORY
 
 echo "container deleted successfully: $CONTAINER_NAME"
+
+exit 0

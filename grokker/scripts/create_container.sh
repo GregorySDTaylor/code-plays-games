@@ -30,3 +30,5 @@ fi
 echo "creating file system layer directory: $FSL_DIRECTORY"
 mkdir -p $FSL_DIRECTORY
 echo "container created: $CONTAINER_NAME"
+
+exit 0

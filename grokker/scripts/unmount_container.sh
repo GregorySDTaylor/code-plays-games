@@ -40,3 +40,5 @@ echo "deleting overlay directory: $OVERLAY_DIRECTORY"
 rm -rf $OVERLAY_DIRECTORY
 
 echo "container unmounted successfully: $CONTAINER_NAME"
+
+exit 0
