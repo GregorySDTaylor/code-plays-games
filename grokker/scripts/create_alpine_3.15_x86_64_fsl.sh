@@ -47,6 +47,8 @@ echo "configuring alpine repositories: $ALPINE_MAIN_REPOSITORY,  $ALPINE_COMMUNI
 mkdir -p $TARGET_OVERLAY/etc/apk
 echo $ALPINE_MAIN_REPOSITORY > $TARGET_OVERLAY/etc/apk/repositories
 echo $ALPINE_COMMUNITY_REPOSITORY >> $TARGET_OVERLAY/etc/apk/repositories
+echo "creating system user coderunner with uid 1013"
+chroot $TARGET_OVERLAY adduser --system --uid=1013 coderunner
 echo "cleaning up temporary files directory: $APK_TEMP_DIRECTORY"
 rm -rf $APK_TEMP_DIRECTORY
 echo "unmounting container: $CONTAINER_NAME"

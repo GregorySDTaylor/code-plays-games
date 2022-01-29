@@ -60,6 +60,9 @@ then
    exit 1
 fi
 
+echo "creating fsl base if not already exist: $FSL_BASE_DIRECTORY"
+mkdir -p $BASE_LOWER_DIRECTORY
+
 echo "creating temporary files directory: $TEMP_DIRECTORY"
 mkdir -p $TEMP_DIRECTORY
 

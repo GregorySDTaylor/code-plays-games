@@ -13,7 +13,8 @@ CONTAINER_NAME=rust_test
 PROJECT_NAME=hello_rust
 SCRIPT_DIRECTORY=$GROKKER_DIRECTORY/scripts
 OVERLAY_DIRECTORY=$GROKKER_DIRECTORY/overlay_mounts/$CONTAINER_NAME
-CARGO_DIR=/root/.cargo/bin
+CODERUNNER_HOME=home/coderunner
+CARGO_DIR=/$CODERUNNER_HOME/.cargo/bin
 
 echo "creating container: $BUILD_CONTAINER_NAME"
 $SCRIPT_DIRECTORY/create_container.sh -n $BUILD_CONTAINER_NAME
@@ -25,24 +26,32 @@ $SCRIPT_DIRECTORY/create_container.sh -n $CONTAINER_NAME
 echo "mounting container: $CONTAINER_NAME"
 $SCRIPT_DIRECTORY/mount_container.sh -n $CONTAINER_NAME -l alpine_3.15_x86_64
 
-unshare --ipc --mount --net --pid --user --cgroup --fork \
-    --map-root-user --kill-child --mount-proc=$BUILD_OVERLAY_DIRECTORY/proc \
-    chroot $BUILD_OVERLAY_DIRECTORY \
-    $CARGO_DIR/cargo new $PROJECT_NAME --vcs none
+echo "initializing cargo project $PROJECT_NAME as user"
+unshare --ipc --mount --net --pid --cgroup --fork \
+    --kill-child --mount-proc=$BUILD_OVERLAY_DIRECTORY/proc \
+    chroot --userspec=1013 $BUILD_OVERLAY_DIRECTORY /bin/ash -c \
+    "cd /$CODERUNNER_HOME && export HOME=/$CODERUNNER_HOME && $CARGO_DIR/cargo new $PROJECT_NAME --vcs none"
 
-cat $SCRIPT_DIRECTORY/resources/hello.rs > $BUILD_OVERLAY_DIRECTORY/$PROJECT_NAME/src/main.rs
+echo "copying source into $PROJECT_NAME/src/main.rs"
+cat $SCRIPT_DIRECTORY/resources/hello.rs > $BUILD_OVERLAY_DIRECTORY/$CODERUNNER_HOME/$PROJECT_NAME/src/main.rs
 
-unshare --ipc --mount --net --pid --user --cgroup --fork \
-    --map-root-user --kill-child --mount-proc=$BUILD_OVERLAY_DIRECTORY/proc \
-    chroot $BUILD_OVERLAY_DIRECTORY /bin/ash -c \
-    "cd /$PROJECT_NAME && $CARGO_DIR/cargo build --release"
+echo "building cargo project $PROJECT_NAME as user"
+unshare --ipc --mount --net --pid --cgroup --fork \
+    --kill-child --mount-proc=$BUILD_OVERLAY_DIRECTORY/proc \
+    chroot --userspec=1013 $BUILD_OVERLAY_DIRECTORY /bin/ash -c \
+    "cd /$CODERUNNER_HOME/$PROJECT_NAME && export HOME=/$CODERUNNER_HOME && $CARGO_DIR/cargo build --release"
 
-cp $BUILD_OVERLAY_DIRECTORY/$PROJECT_NAME/target/release/$PROJECT_NAME $OVERLAY_DIRECTORY
+echo "copying compiled $PROJECT_NAME to run container"
+cp $BUILD_OVERLAY_DIRECTORY/$CODERUNNER_HOME/$PROJECT_NAME/target/release/$PROJECT_NAME $OVERLAY_DIRECTORY/$CODERUNNER_HOME
 
-unshare --ipc --mount --net --pid --user --cgroup --fork \
-    --map-root-user --kill-child --mount-proc=$OVERLAY_DIRECTORY/proc \
-    chroot $OVERLAY_DIRECTORY \
-    /$PROJECT_NAME
+echo "changing $PROJECT_NAME ownership to coderunner"
+chroot $OVERLAY_DIRECTORY chown coderunner $CODERUNNER_HOME/$PROJECT_NAME
+
+echo "running $PROJECT_NAME as user"
+unshare --ipc --mount --net --pid --cgroup --fork \
+    --kill-child --mount-proc=$OVERLAY_DIRECTORY/proc \
+    chroot --userspec=1013 $OVERLAY_DIRECTORY \
+    /$CODERUNNER_HOME/$PROJECT_NAME
 
 echo "unmounting container: $CONTAINER_NAME"
 $SCRIPT_DIRECTORY/unmount_container.sh -n $CONTAINER_NAME
