@@ -16,7 +16,7 @@ $SCRIPT_DIRECTORY/create_container.sh -n $CONTAINER_NAME
 echo "mounting container: $CONTAINER_NAME"
 $SCRIPT_DIRECTORY/mount_container.sh -n $CONTAINER_NAME -l alpine_3.15_x86_64
 
-cp resources/install_rust.sh $OVERLAY_DIRECTORY/install_rust.sh
+cp $SCRIPT_DIRECTORY/resources/install_rust.sh $OVERLAY_DIRECTORY/install_rust.sh
 chroot $OVERLAY_DIRECTORY ./install_rust.sh
 rm $OVERLAY_DIRECTORY/install_rust.sh
 
