@@ -9,7 +9,7 @@ BASE_LOWER_DIRECTORY="$GROKKER_DIRECTORY/file_system_layers/base"
 # Get the options
 while getopts "n:l:" option; do
    case $option in
-      n) 
+      n) # Validate name not base
          if [ "$OPTARG" == "base" ] 
          then
             echo "failed: file system layer name reserved: $OPTARG"
@@ -89,6 +89,23 @@ mount -t proc,ro none $OVERLAY_DIRECTORY/proc
 echo "creating the kernel and system information mount: $OVERLAY_DIRECTORY/sys"
 mkdir -p $OVERLAY_DIRECTORY/sys
 mount -o bind,ro /sys $OVERLAY_DIRECTORY/sys
+
+echo "creating memory cgroup: $OVERLAY_DIRECTORY/cgroups/memory/$CONTAINER_NAME"
+mkdir -p $OVERLAY_DIRECTORY/cgroups/memory
+mount -t cgroup -o memory none $OVERLAY_DIRECTORY/cgroups/memory
+mkdir -p $OVERLAY_DIRECTORY/cgroups/memory/$CONTAINER_NAME
+echo "104857600" > $OVERLAY_DIRECTORY/cgroups/memory/$CONTAINER_NAME/memory.limit_in_bytes
+echo "104857600" > $OVERLAY_DIRECTORY/cgroups/memory/$CONTAINER_NAME/memory.memsw.limit_in_bytes
+echo "setting pid $PPID in $CONTAINER_NAME memory cgroup"
+echo $PPID > $OVERLAY_DIRECTORY/cgroups/memory/$CONTAINER_NAME/tasks
+
+echo "creating pids cgroup: $OVERLAY_DIRECTORY/cgroups/pids/$CONTAINER_NAME"
+mkdir -p $OVERLAY_DIRECTORY/cgroups/pids
+mount -t cgroup -o pids none $OVERLAY_DIRECTORY/cgroups/pids
+mkdir -p $OVERLAY_DIRECTORY/cgroups/pids/$CONTAINER_NAME
+echo "64" > $OVERLAY_DIRECTORY/cgroups/pids/$CONTAINER_NAME/pids.max
+echo "setting pid $PPID in $CONTAINER_NAME pids cgroup"
+echo $PPID > $OVERLAY_DIRECTORY/cgroups/pids/$CONTAINER_NAME/tasks
 
 echo "container mounted successfully: $CONTAINER_NAME"
 

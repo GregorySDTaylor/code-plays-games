@@ -27,6 +27,12 @@ fi
 TEMP_DIRECTORY=$GROKKER_DIRECTORY/temp/$CONTAINER_NAME
 OVERLAY_DIRECTORY=$GROKKER_DIRECTORY/overlay_mounts/$CONTAINER_NAME
 
+echo "deleting memory cgroup: $OVERLAY_DIRECTORY/cgroups/memory/$CONTAINER_NAME"
+rmdir $OVERLAY_DIRECTORY/cgroups/memory/$CONTAINER_NAME
+
+echo "deleting pids cgroup: $OVERLAY_DIRECTORY/cgroups/pids/$CONTAINER_NAME"
+rmdir $OVERLAY_DIRECTORY/cgroups/pids/$CONTAINER_NAME
+
 # Unmounts all under the specified directory tree.
 cat /proc/mounts | cut -d' ' -f2 | grep "^$OVERLAY_DIRECTORY" | sort -r | while read path; do
     echo "unmounting $path" >&2
