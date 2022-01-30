@@ -30,7 +30,7 @@ echo "initializing cargo project $PROJECT_NAME as user"
 unshare --ipc --mount --net --pid --cgroup --fork \
     --kill-child --mount-proc=$BUILD_OVERLAY_DIRECTORY/proc \
     chroot --userspec=1013 $BUILD_OVERLAY_DIRECTORY /bin/ash -c \
-    "cd /$CODERUNNER_HOME && export HOME=/$CODERUNNER_HOME && $CARGO_DIR/cargo new $PROJECT_NAME --vcs none"
+    "cd /$CODERUNNER_HOME && export HOME=/$CODERUNNER_HOME && $CARGO_DIR/cargo new $PROJECT_NAME --vcs none" || true
 
 echo "copying source into $PROJECT_NAME/src/main.rs"
 cat $SCRIPT_DIRECTORY/resources/hello.rs > $BUILD_OVERLAY_DIRECTORY/$CODERUNNER_HOME/$PROJECT_NAME/src/main.rs
@@ -39,7 +39,7 @@ echo "building cargo project $PROJECT_NAME as user"
 unshare --ipc --mount --net --pid --cgroup --fork \
     --kill-child --mount-proc=$BUILD_OVERLAY_DIRECTORY/proc \
     chroot --userspec=1013 $BUILD_OVERLAY_DIRECTORY /bin/ash -c \
-    "cd /$CODERUNNER_HOME/$PROJECT_NAME && export HOME=/$CODERUNNER_HOME && $CARGO_DIR/cargo build --release"
+    "cd /$CODERUNNER_HOME/$PROJECT_NAME && export HOME=/$CODERUNNER_HOME && $CARGO_DIR/cargo build --release" || true
 
 echo "copying compiled $PROJECT_NAME to run container"
 cp $BUILD_OVERLAY_DIRECTORY/$CODERUNNER_HOME/$PROJECT_NAME/target/release/$PROJECT_NAME $OVERLAY_DIRECTORY/$CODERUNNER_HOME
@@ -51,7 +51,7 @@ echo "running $PROJECT_NAME as user"
 unshare --ipc --mount --net --pid --cgroup --fork \
     --kill-child --mount-proc=$OVERLAY_DIRECTORY/proc \
     chroot --userspec=1013 $OVERLAY_DIRECTORY \
-    /$CODERUNNER_HOME/$PROJECT_NAME
+    /$CODERUNNER_HOME/$PROJECT_NAME || true
 
 echo "unmounting container: $CONTAINER_NAME"
 $SCRIPT_DIRECTORY/unmount_container.sh -n $CONTAINER_NAME

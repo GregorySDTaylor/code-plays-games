@@ -27,7 +27,7 @@ echo "running hello.py as user"
 unshare --ipc --mount --net --pid --cgroup --fork \
     --kill-child --mount-proc=$OVERLAY_DIRECTORY/proc \
     chroot --userspec=1013 $OVERLAY_DIRECTORY \
-    python3 /$CODERUNNER_HOME/hello.py
+    python3 /$CODERUNNER_HOME/hello.py || true
 
 echo "unmounting container: $CONTAINER_NAME"
 $SCRIPT_DIRECTORY/unmount_container.sh -n $CONTAINER_NAME

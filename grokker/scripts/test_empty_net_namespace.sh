@@ -21,7 +21,7 @@ echo "running ping as user"
 unshare --ipc --mount --net --pid --cgroup --fork \
     --kill-child --mount-proc=$OVERLAY_DIRECTORY/proc \
     chroot --userspec=1013 $OVERLAY_DIRECTORY /bin/ash -c \
-    "ping -c 4 www.google.com || ping -c 4 172.217.0.36 || ping -c 4 127.0.0.1"
+    "ping -c 4 www.google.com || ping -c 4 172.217.0.36 || ping -c 4 127.0.0.1" || true
 
 echo "unmounting container: $CONTAINER_NAME"
 $SCRIPT_DIRECTORY/unmount_container.sh -n $CONTAINER_NAME
