@@ -107,6 +107,16 @@ echo "64" > $OVERLAY_DIRECTORY/cgroups/pids/$CONTAINER_NAME/pids.max
 echo "setting pid $PPID in $CONTAINER_NAME pids cgroup"
 echo $PPID > $OVERLAY_DIRECTORY/cgroups/pids/$CONTAINER_NAME/tasks
 
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/sec-cpu
+echo "creating cpu cgroup: $OVERLAY_DIRECTORY/cgroups/cpu/$CONTAINER_NAME"
+mkdir -p $OVERLAY_DIRECTORY/cgroups/cpu
+mount -t cgroup -o cpu none $OVERLAY_DIRECTORY/cgroups/cpu
+mkdir -p $OVERLAY_DIRECTORY/cgroups/cpu/$CONTAINER_NAME
+echo "100000" > $OVERLAY_DIRECTORY/cgroups/cpu/$CONTAINER_NAME/cpu.cfs_period_us
+echo "50000" > $OVERLAY_DIRECTORY/cgroups/cpu/$CONTAINER_NAME/cpu.cfs_quota_us
+echo "setting pid $PPID in $CONTAINER_NAME cpu cgroup"
+echo $PPID > $OVERLAY_DIRECTORY/cgroups/cpu/$CONTAINER_NAME/tasks
+
 echo "container mounted successfully: $CONTAINER_NAME"
 
 exit 0
